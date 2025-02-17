@@ -67,3 +67,44 @@ yarn-debug.log*
 /storage/*
 !/storage/.keep
 /public/uploads
+
+# MANUALLY ADDED =================================
+.env
+
+
+# RAILS IGNORE =================================
+
+# 環境変数（APIキーやデータベースの設定）
+backend/.env
+backend/config/credentials.yml.enc
+backend/config/master.key
+
+# Google Drive API 認証ファイル
+backend/config/google_credentials.json
+
+# MySQL のデータベースファイル
+backend/db/*.mysql
+backend/db/*.mysql-journal
+
+# Docker関連
+backend/docker-compose.override.yml
+backend/.docker
+backend/tmp/*
+backend/log/*
+backend/vendor/bundle
+
+# rails def
+backend/log/*
+!backend/log/.keep
+backend/tmp/*
+!backend/tmp/.keep
+backend/public/system
+backend/public/uploads
+backend/storage/*
+!backend/storage/.keep
+backend/db/*.sqlite3
+backend/db/*.sqlite3-journal
+backend/vendor/bundle
+backend/node_modules
+backend/yarn-error.log
+backend.byebug_history
