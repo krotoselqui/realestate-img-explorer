@@ -1,1 +1,18 @@
+name: CI
 
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  empty:
+    name: No Operation
+    runs-on: ubuntu-latest
+    steps:
+      - name: empty job
+        run: echo "No operation, just testing the workflow trigger."
