@@ -15,5 +15,19 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:3000
+
 volumes:
   mysql_data:

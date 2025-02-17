@@ -1,0 +1,16 @@
+node_modules
+.next
+coverage
+.git
+.env*
+.dockerignore
+Dockerfile
+README.md
+.gitignore
+.eslintrc*
+.prettier*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
