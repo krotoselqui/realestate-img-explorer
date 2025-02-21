@@ -24,6 +24,16 @@ services:
     build: ./backend
     ports:
       - "3000:3000"
+    environment:
+      RAILS_ENV: development
+      BUNDLE_WITHOUT: ""
+      DATABASE_URL: "mysql2://user:password@db:3306/realestate_dev"
+    working_dir: /rails
+    entrypoint: ["/bin/bash"]
+    command: >
+      -c "bundle exec rake db:migrate;
+          echo 'Migration completed';
+          bundle exec rails server -b 0.0.0.0"
     depends_on:
       db:
         condition: service_healthy
