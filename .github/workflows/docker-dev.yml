@@ -14,7 +14,8 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Dockerイメージのビルド
-      run: docker compose build
+     # run: docker compose build
+      run: docker compose build db backend
 
     - name: Docker Composeサービス起動
       run: |
