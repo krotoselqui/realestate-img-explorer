@@ -26,11 +26,11 @@ RUN rm -f /etc/apt/sources.list.d/debian.sources && \
         libvips && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Set production environment
-ENV RAILS_ENV="production" \
+# Set environment
+ENV RAILS_ENV="development" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development" \
+    BUNDLE_WITHOUT="" \
     DOCKERIZE_VERSION="v0.6.1"
 
 # Throw-away build stage to reduce size of final image
@@ -56,12 +56,18 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
+# Fix line endings and make scripts executable
+RUN apt-get update && apt-get install -y dos2unix && \
+    find /rails/bin -type f -exec dos2unix {} \; && \
+    find /rails/bin -type f -exec chmod +x {} \; && \
+    apt-get remove -y dos2unix && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
-
-
-
+# Final stage for app image
 # Final stage for app image
 FROM base
 
