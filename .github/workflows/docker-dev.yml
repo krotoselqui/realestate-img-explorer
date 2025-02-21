@@ -19,7 +19,7 @@ jobs:
 
     - name: Docker Composeサービス起動
       run: |
-        docker compose up -d
+        docker compose up -d db backend 
         sleep 30  # サービスの起動待ち
 
     - name: データベース接続確認
