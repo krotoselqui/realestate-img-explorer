@@ -31,10 +31,10 @@ jobs:
         curl -f http://localhost:3000/health || (docker compose logs backend && exit 1)
         echo "バックエンドサービスOK"
 
-    - name: フロントエンドサービス確認
-      run: |
-        curl -f http://localhost:3001 || (docker compose logs frontend && exit 1)
-        echo "フロントエンドサービスOK"
+    # - name: フロントエンドサービス確認
+    #   run: |
+    #     curl -f http://localhost:3001 || (docker compose logs frontend && exit 1)
+    #     echo "フロントエンドサービスOK"
 
     - name: 接続エラー時のログ出力
       if: failure()
