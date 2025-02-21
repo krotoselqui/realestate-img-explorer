@@ -1,0 +1,45 @@
+name: DockerCheck[Develop]
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  docker-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Dockerイメージのビルド
+      run: docker-compose build
+
+    - name: Docker Composeサービス起動
+      run: |
+        docker-compose up -d
+        sleep 30  # サービスの起動待ち
+
+    - name: データベース接続確認
+      run: |
+        docker-compose exec -T db mysqladmin ping -h localhost -uuser -ppassword
+        echo "データベース接続OK"
+
+    - name: バックエンドサービス確認
+      run: |
+        curl -f http://localhost:3000/health || (docker-compose logs backend && exit 1)
+        echo "バックエンドサービスOK"
+
+    - name: フロントエンドサービス確認
+      run: |
+        curl -f http://localhost:3001 || (docker-compose logs frontend && exit 1)
+        echo "フロントエンドサービスOK"
+
+    - name: 接続エラー時のログ出力
+      if: failure()
+      run: docker-compose logs
+
+    - name: クリーンアップ
+      if: always()
+      run: docker-compose down -v
