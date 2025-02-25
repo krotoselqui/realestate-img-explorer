@@ -119,3 +119,4 @@ frontend/yarn.lock
 frontend/package-lock.json
 frontend/coverage/
 frontend/.eslintcache
+frontend/logs/

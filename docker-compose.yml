@@ -57,7 +57,9 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: ["npm", "run", "dev"]
+      - ./frontend/logs:/app/logs
+    command: >
+      sh -c "npm run dev > /app/logs/frontend.log 2>&1"
 
 volumes:
   mysql_data:
