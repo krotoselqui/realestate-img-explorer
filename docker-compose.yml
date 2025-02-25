@@ -37,15 +37,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   
   frontend:
     build: ./frontend
     ports:
       - "3001:3001"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       - NEXT_PUBLIC_API_BASE_URL=http://backend:3000
+      - PORT=3001
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
 
 volumes:
   mysql_data:
