@@ -3,11 +3,24 @@ const { parse } = require('url');
 const next = require('next');
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = '0.0.0.0';
 const port = parseInt(process.env.PORT, 10) || 3001;
 
-const app = next({ dev, hostname, port });
+// IPv4とIPv6の両方でリッスンするための設定
+const app = next({
+  dev,
+  hostname: '::',
+  port
+});
 const handle = app.getRequestHandler();
+
+// グローバルなエラーハンドリング
+process.on('uncaughtException', (err) => {
+  console.error('[Uncaught Exception]', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('[Unhandled Rejection]', err);
+});
 
 app.prepare().then(() => {
   createServer(async (req, res) => {
@@ -28,7 +41,7 @@ app.prepare().then(() => {
       console.error(err);
       process.exit(1);
     })
-    .listen(port, hostname, () => {
-      console.log(`> Ready on http://${hostname}:${port}`);
+    .listen(port, '::', () => {
+      console.log(`> Ready on http://[::]:${port}`);
     });
 });
