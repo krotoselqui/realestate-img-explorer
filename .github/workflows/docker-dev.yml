@@ -2,9 +2,9 @@ name: DockerCheck[Develop]
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, feature/front-omit ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, feature/front-omit ]
 
 jobs:
   docker-check:
