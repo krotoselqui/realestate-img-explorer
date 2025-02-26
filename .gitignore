@@ -120,3 +120,5 @@ frontend/package-lock.json
 frontend/coverage/
 frontend/.eslintcache
 frontend/logs/
+# Frontend directory
+frontend/
