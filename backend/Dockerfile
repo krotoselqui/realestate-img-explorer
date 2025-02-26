@@ -47,23 +47,17 @@ RUN rm -f /etc/apt/sources.list.d/debian.sources && \
         pkg-config && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Copy and prepare scripts first
-COPY bin/ /rails/bin/
-RUN apt-get update && apt-get install -y dos2unix && \
-    find /rails/bin -type f -exec dos2unix {} \; && \
-    find /rails/bin -type f -exec chmod +x {} \; && \
-    apt-get remove -y dos2unix && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
-
 # Install application gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
-# Copy remaining application code
+# Copy application code
 COPY . .
+
+# Set up executable permissions
+RUN chmod +x /rails/bin/*
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
