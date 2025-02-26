@@ -5,10 +5,9 @@ const next = require('next');
 const dev = process.env.NODE_ENV !== 'production';
 const port = parseInt(process.env.PORT, 10) || 3001;
 
-// IPv4とIPv6の両方でリッスンするための設定
+// IPv4でリッスンするための設定
 const app = next({
   dev,
-  hostname: '::',
   port
 });
 const handle = app.getRequestHandler();
@@ -42,6 +41,7 @@ app.prepare().then(() => {
       process.exit(1);
     })
     .listen(port, '::', () => {
-      console.log(`> Ready on http://[::]:${port}`);
+      console.log(`> Ready on http://127.0.0.1:${port}`);
+      console.log(`  Also available on http://localhost:${port}`);
     });
 });
