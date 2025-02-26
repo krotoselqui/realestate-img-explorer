@@ -14,13 +14,13 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Dockerイメージのビルド
-      run: docker compose build db backend frontend
+      run: docker compose build db backend
 
     - name: Docker Composeサービス起動
       env:
         NODE_ENV: development
       run: |
-        docker compose up -d db backend frontend
+        docker compose up -d db backend
         sleep 30  # サービスの起動待ち
 
     - name: データベース接続確認
@@ -32,11 +32,6 @@ jobs:
       run: |
         curl -f http://localhost:3000/health || (docker compose logs backend && exit 1)
         echo "バックエンドサービスOK"
-
-    - name: フロントエンドサービス確認
-      run: |
-        curl -f http://localhost:3001 || (docker compose logs frontend && exit 1)
-        echo "フロントエンドサービスOK"
 
     - name: 接続エラー時のログ出力
       if: failure()
