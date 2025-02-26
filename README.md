@@ -5,7 +5,7 @@ webapp to manage real estate images by google drive
 
 - **バックエンド:** Ruby on Rails  
 - **データベース:** MySQL  
-- **フロントエンド:** Next.js / React  
+
 - **デプロイ:** Docker  
 - **CI:** GitHub Actions  
 
