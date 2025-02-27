@@ -20,9 +20,31 @@
   <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
       <div class="px-4 py-6 sm:px-0">
-        <div class="h-96 rounded-lg border-4 border-dashed border-gray-200">
-          <div class="flex items-center justify-center h-full">
-            <h2 class="text-2xl font-semibold text-gray-900">Welcome, <%= current_user.username %></h2>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Welcome, <%= current_user.username %></h2>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Google Drive連携カード -->
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-6">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2m0 0H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <h3 class="text-lg font-medium text-gray-900">Googleドライブと連携</h3>
+                  <p class="mt-1 text-sm text-gray-500">
+                    Googleドライブと連携して、画像ファイルを簡単に管理できます。
+                  </p>
+                </div>
+              </div>
+              <div class="mt-6">
+                <%= link_to 'Google連携を開始',
+                    auth_google_oauth2_path,
+                    class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+              </div>
+            </div>
           </div>
         </div>
       </div>

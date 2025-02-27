@@ -17,7 +17,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
       <div class="flex justify-between items-center">
         <div class="flex-shrink-0">
-          <%= link_to 'Realestate Explorer', root_path, class: 'text-xl font-bold hover:text-gray-200' %>
+          <%= link_to 'Image Explorer', root_path, class: 'text-xl font-bold hover:text-gray-200' %>
         </div>
         <div class="flex items-center space-x-4">
           <% if user_signed_in? %>
@@ -33,11 +33,10 @@
                 </svg>
               </button>
 
-              <div 
+              <div
                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 text-gray-700 hidden z-50"
                 data-dropdown-target="menu"
               >
-                <div class="border-t border-gray-100"></div>
                 <%= button_to 'ログアウト',
                             logout_path,
                             method: :delete,

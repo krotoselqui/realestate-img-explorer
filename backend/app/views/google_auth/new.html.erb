@@ -1,0 +1,43 @@
+<div class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Googleアカウントとの連携
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Googleドライブと連携して画像を管理します
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div class="text-center">
+        <%= button_to auth_google_oauth2_path,
+                    method: :get,
+                    params: { start_auth: true },
+                    class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+          <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.545,12.151L12.545,12.151c0,1.054,0.855,1.909,1.909,1.909h3.536c-0.607,1.972-2.101,3.467-4.26,3.467c-2.624,0-4.747-2.124-4.747-4.747s2.124-4.747,4.747-4.747c1.113,0,2.148,0.374,2.965,1.044l2.068-2.068C16.686,5.763,14.468,4.752,12,4.752c-4.418,0-8,3.582-8,8s3.582,8,8,8c4.418,0,8-3.582,8-8h-4.545C13.4,12.751,12.545,12.151,12.545,12.151z"/>
+          </svg>
+          Googleアカウントで続ける
+        <% end %>
+      </div>
+
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">
+              または
+            </span>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <%= link_to "戻る", :back, class: "w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_065929) do
     t.string "google_email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "google_access_token"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["google_email"], name: "index_users_on_google_email"
     t.index ["username"], name: "index_users_on_username", unique: true

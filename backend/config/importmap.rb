@@ -1,10 +1,13 @@
 # Pin npm packages by running ./bin/importmap
 
 # Core libraries
-pin "@hotwired/turbo-rails", to: "turbo.min.js"
-pin "@hotwired/stimulus", to: "stimulus.min.js"
-pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
+pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
+pin "@hotwired/stimulus", to: "stimulus.min.js", preload: true
 
 # Application
-pin "application", preload: true, to: "application.js"
-pin_all_from "app/javascript/controllers", under: "controllers", preload: true
+pin "application", preload: true
+
+# Controllers
+pin "controllers/application", to: "controllers/application.js", preload: true
+pin "controllers/dropdown_controller", to: "controllers/dropdown_controller.js", preload: true
+pin "controllers", to: "controllers/index.js", preload: true

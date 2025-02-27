@@ -74,6 +74,21 @@ Rails.application.configure do
   # Allow serving of images, stylesheets, and JavaScripts from an asset server
   config.asset_host = 'http://localhost:3000'
 
+  # Configure static file server headers
+  config.public_file_server.headers = {
+    'Access-Control-Allow-Origin' => '*',
+    'Cache-Control' => "public, max-age=#{1.hour.to_i}"
+  }
+
+  # Ensure proper MIME types for assets
+  config.action_dispatch.default_headers.merge!({
+    'Content-Type' => 'text/html; charset=utf-8'
+  })
+
+  # Configure Rack::Mime types
+  Rack::Mime::MIME_TYPES['.js'] = 'application/javascript'
+  Rack::Mime::MIME_TYPES['.css'] = 'text/css'
+
   # Enable debug mode in Webpacker
   config.debug_exception_response_format = :default
   config.assets.debug = true

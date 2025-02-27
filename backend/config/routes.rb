@@ -6,6 +6,10 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "health" => "rails/health#show"
 
+  # Google OAuth認証関連のルーティング
+  get 'auth/google_oauth2', to: 'google_auth#new'
+  get 'auth/google_oauth2/callback', to: 'google_auth#callback'
+
   # ログイン・ユーザー登録関連のルーティング
   get 'login', to: 'sessions#new'
   post 'login', to: 'sessions#create'
@@ -19,6 +23,6 @@ Rails.application.routes.draw do
   post 'upload', to: 'files#upload'
   post 'folders', to: 'files#create_folder'
 
-  # ルートページをログインページに設定
-  root 'sessions#new'
+  # ルートページを認証状態に応じて振り分け
+  root 'home#index'
 end
