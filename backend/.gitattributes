@@ -1,16 +1,16 @@
 * -text
 
-*.rb text eol=lf
-*.rake text eol=lf
-*.yml text eol=lf
-*.json text eol=lf
-*.md text eol=lf
-*.js text eol=lf
-*.css text eol=lf
-*.erb text eol=lf
-Dockerfile text eol=lf
-.dockerignore text eol=lf
-.gitignore text eol=lf
-.gitattributes text eol=lf
+*.rb binary
+*.sh binary
+*.yml binary
+*.json binary
+*.md binary
+*.js binary
+*.css binary
+*.erb binary
+Dockerfile binary
+.dockerignore binary
+.gitignore binary
+.gitattributes binary
 
-bin/* text eol=lf
+bin/* binary

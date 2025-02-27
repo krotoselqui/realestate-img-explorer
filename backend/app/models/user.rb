@@ -24,6 +24,12 @@ class User < ApplicationRecord
             length: { minimum: 6 },
             if: -> { new_record? || changes[:password_digest] }
 
+  # ログイン認証メソッド
+  def self.authenticate_by_email_or_username(login, password)
+    user = User.find_by(email: login.downcase) || User.find_by(username: login)
+    user&.authenticate(password)
+  end
+
   private
 
   def downcase_email

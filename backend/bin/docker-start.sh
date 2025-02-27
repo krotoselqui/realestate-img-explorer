@@ -3,20 +3,37 @@ set -e
 
 cd /rails
 
-# マイグレーションの実行
-bundle exec rake db:migrate
+# 古いPIDファイルを削除
+rm -f /rails/tmp/pids/server.pid
 
-# マイグレーションの実行
-bundle exec rake db:migrate
-
-# アセットディレクトリの作成
+# 必要なディレクトリの作成
 mkdir -p /rails/app/assets/builds
 mkdir -p /rails/tmp/cache
+mkdir -p /rails/public/assets
+
+# 古いPIDファイルを削除
+rm -f /rails/tmp/pids/server.pid
+
+cd /rails
 
 # Node.jsの依存関係をインストール
-cd /rails && npm install
+npm install
 
-# アセットのビルドとプリコンパイル
+# アプリケーションのビルド環境を設定
+export RAILS_ENV=development
+export NODE_ENV=development
+
+# アセットディレクトリの準備
+mkdir -p ./app/assets/builds
+mkdir -p ./public/assets
+
+# Tailwindのビルド
+npm run build:css
+
+# マイグレーションの実行
+bundle exec rake db:migrate
+
+# アセットのプリコンパイル
 bundle exec rails assets:clean
 bundle exec rails assets:precompile
 

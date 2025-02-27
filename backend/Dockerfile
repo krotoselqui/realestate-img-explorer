@@ -1,13 +1,3 @@
-# syntax=docker/dockerfile:1
-# check=error=true
-
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t backend .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name backend backend
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
-
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.0
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
@@ -20,10 +10,17 @@ RUN rm -f /etc/apt/sources.list.d/debian.sources && \
     echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list && \
     apt-get update -qq && \
     apt-get install --no-install-recommends -y \
+        build-essential \
         curl \
         default-mysql-client \
         libjemalloc2 \
-        libvips && \
+        libvips \
+        nodejs \
+        npm && \
+    npm install -g n && \
+    n stable && \
+    hash -r && \
+    npm install -g npm@latest && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Set environment
