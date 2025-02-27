@@ -39,10 +39,6 @@ RAILS_ENV=development bundle exec rails assets:precompile
 # マイグレーションの実行
 bundle exec rake db:migrate
 
-# 権限の設定
-chmod -R 777 ./public/assets
-chmod -R 777 ./tmp
-
 echo 'Setup completed'
 
 # Railsサーバーの起動
