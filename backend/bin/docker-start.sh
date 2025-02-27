@@ -27,15 +27,21 @@ export NODE_ENV=development
 mkdir -p ./app/assets/builds
 mkdir -p ./public/assets
 
+# アセットのクリーンアップ
+bundle exec rails assets:clean
+
 # Tailwindのビルド
 npm run build:css
+
+# アセットのプリコンパイル
+RAILS_ENV=development bundle exec rails assets:precompile
 
 # マイグレーションの実行
 bundle exec rake db:migrate
 
-# アセットのプリコンパイル
-bundle exec rails assets:clean
-bundle exec rails assets:precompile
+# 権限の設定
+chmod -R 777 ./public/assets
+chmod -R 777 ./tmp
 
 echo 'Setup completed'
 

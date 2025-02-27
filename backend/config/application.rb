@@ -27,6 +27,11 @@ module Backend
     # APIモードを無効化し、フルスタックのRailsアプリケーションとして動作させる
     config.api_only = false
 
+    # アセットパイプラインの設定
+    config.assets.enabled = true
+    config.assets.paths << Rails.root.join("app", "assets", "builds")
+    config.assets.precompile += %w( application.css )
+
     # フルスタックアプリケーションに必要なミドルウェアを追加
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
