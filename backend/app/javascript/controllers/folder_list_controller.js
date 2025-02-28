@@ -4,38 +4,65 @@ export default class extends Controller {
   static targets = ["list", "status"]
 
   connect() {
-    console.log("FolderList controller connected")
+    console.log("\n=== FolderList Controller Initialized ===")
+    console.log("Loading folders for dashboard...")
+    
+    if (!this.listTarget) {
+      console.error("List target not found!")
+      return
+    }
+
     this.loadFolders()
   }
 
   async loadFolders() {
-    console.log("=== Starting folder list fetch ===")
+    console.log("\n=== Starting Folder List Fetch ===")
+    this.showLoading()
+
     try {
-      // リクエスト開始
+      console.log("Preparing request...")
+      const headers = {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]')?.content
+      }
+      console.log("Request headers:", headers)
+
       console.log("Sending request to /files?type=folder")
-      const response = await fetch('/files?type=folder', {
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      console.log("Response status:", response.status)
-      console.log("Response headers:", Object.fromEntries([...response.headers.entries()]))
+      const response = await fetch('/files?type=folder', { headers })
+      
+      console.log("Response received:")
+      console.log("- Status:", response.status)
+      console.log("- Status Text:", response.statusText)
+      console.log("- Headers:", Object.fromEntries([...response.headers.entries()]))
+
+      if (response.redirected) {
+        console.log("Detected redirect to:", response.url)
+        window.location.href = response.url
+        return
+      }
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error("Error response:", errorText)
-        throw new Error(`HTTP error! status: ${response.status}`)
+        console.error("Error response content:", errorText)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
       const contentType = response.headers.get('content-type')
+      console.log("Content-Type:", contentType)
+      
       if (!contentType || !contentType.includes('application/json')) {
-        console.error("Invalid content type:", contentType)
-        throw new Error('Invalid response format')
+        console.error("Invalid content type received")
+        throw new Error(`Invalid content type: ${contentType}`)
       }
 
       const data = await response.json()
       console.log("Response data:", data)
+      if (data.redirect_to) {
+        console.log("Auth redirect received:", data.redirect_to)
+        window.location.href = data.redirect_to
+        return
+      }
 
       if (data.error) {
         throw new Error(data.error)
@@ -45,15 +72,34 @@ export default class extends Controller {
         console.log(`Found ${data.files.length} folders`)
         this.renderFolders(data.files)
       } else {
-        console.log("No folders found in response")
+        console.log("No folders found")
         this.showEmptyState()
       }
+
+      console.log("=== Folder List Fetch Completed ===")
     } catch (error) {
       console.error("Error in loadFolders:", error)
       this.showError(error)
-    } finally {
-      console.log("=== Completed folder list fetch ===")
     }
+  }
+
+  showLoading() {
+    this.listTarget.innerHTML = `
+      <div class="animate-pulse space-y-4 p-4">
+        <div class="flex items-center space-x-4">
+          <div class="w-4 h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="w-4 h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="w-4 h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    `
   }
 
   renderFolders(folders) {

@@ -3,24 +3,28 @@ class FilesController < ApplicationController
   before_action :check_google_auth
 
   def index
-    Rails.logger.info "=== Starting files#index ==="
-    Rails.logger.info "User: #{current_user.email}"
-    Rails.logger.info "Access Token: #{current_user.google_token ? 'Present' : 'Missing'}"
-    
-    begin
-      folder_path = params[:folder]
-      Rails.logger.info "Requested folder path: #{folder_path || 'root'}"
+    Rails.logger.info "\n=== Starting files#index ==="
+    Rails.logger.info "Request details:"
+    Rails.logger.info "  - User: #{current_user.email}"
+    Rails.logger.info "  - Access Token: #{current_user.google_token ? current_user.google_token[0..10] + '...' : 'Missing'}"
+    Rails.logger.info "  - Token Length: #{current_user.google_token&.length}"
+    Rails.logger.info "  - Parameters: #{params.inspect}"
 
-      files = google_drive_service.list_files(folder_path)
-      Rails.logger.info "Retrieved #{files&.length || 0} files from Google Drive"
+    begin
+      files = google_drive_service.list_files(params[:folder])
+      Rails.logger.info "API Response:"
+      Rails.logger.info "  - Files count: #{files&.length || 0}"
+      if files&.first
+        Rails.logger.info "  - Sample file: #{files.first.to_h.slice(:id, :name, :mimeType)}"
+      end
 
       # フォルダのみをフィルタリング
       if params[:type] == 'folder'
         files = files.select { |file| file.mime_type == 'application/vnd.google-apps.folder' }
-        Rails.logger.info "Filtered to #{files.length} folders"
+        Rails.logger.info "  - Filtered folders count: #{files.length}"
       end
 
-      render json: {
+      response = {
         files: files.map { |file|
           {
             id: file.id,
@@ -33,69 +37,43 @@ class FilesController < ApplicationController
           }
         }
       }
+
+      Rails.logger.info "  - Response size: #{response[:files].length} items"
+      Rails.logger.info "=== Successfully completed files#index ==="
+
+      render json: response
+
+    rescue Google::Apis::AuthorizationError => e
+      Rails.logger.error "Authorization Error:"
+      Rails.logger.error "  - Message: #{e.message}"
+      Rails.logger.error "  - Token status: #{current_user.google_token ? 'Present' : 'Missing'}"
+      render json: { 
+        error: "認証エラーが発生しました。再度ログインしてください。",
+        redirect_to: auth_google_oauth2_path
+      }, status: :unauthorized
+
+    rescue Google::Apis::ClientError => e
+      Rails.logger.error "Google API Client Error:"
+      Rails.logger.error "  - Message: #{e.message}"
+      Rails.logger.error "  - Body: #{e.body}"
+      render json: { error: "Googleドライブへのアクセスに失敗しました: #{e.message}" }, 
+             status: :bad_request
+
     rescue => e
-      Rails.logger.error "Error in files#index: #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
-      render json: { error: "フォルダの取得に失敗しました: #{e.message}" }, status: :internal_server_error
-    ensure
-      Rails.logger.info "=== Completed files#index ==="
+      Rails.logger.error "Unexpected Error:"
+      Rails.logger.error "  - Class: #{e.class}"
+      Rails.logger.error "  - Message: #{e.message}"
+      Rails.logger.error "  - Backtrace:\n#{e.backtrace.join("\n")}"
+      render json: { error: "予期せぬエラーが発生しました: #{e.message}" }, 
+             status: :internal_server_error
     end
-  end
-
-  def upload
-    folder_path = params[:folder]
-    uploaded_files = params[:files]
-
-    if uploaded_files.blank?
-      render json: { error: 'No files provided' }, status: :bad_request
-      return
-    end
-
-    results = uploaded_files.map do |file|
-      uploaded_file = google_drive_service.upload_file(folder_path, file)
-      {
-        name: file.original_filename,
-        id: uploaded_file&.id,
-        view_url: uploaded_file&.web_view_link,
-        success: !uploaded_file.nil?
-      }
-    end
-
-    render json: { files: results }
-  rescue => e
-    render json: { error: e.message }, status: :internal_server_error
-  end
-
-  def create_folder
-    parent_path = params[:folder]
-    folder_name = params[:name]
-
-    if folder_name.blank?
-      render json: { error: 'Folder name is required' }, status: :bad_request
-      return
-    end
-
-    folder = google_drive_service.create_folder(parent_path, folder_name)
-    
-    if folder
-      render json: {
-        id: folder.id,
-        name: folder.name
-      }
-    else
-      render json: { error: 'Failed to create folder' }, status: :internal_server_error
-    end
-  rescue => e
-    render json: { error: e.message }, status: :internal_server_error
   end
 
   def set_working_folder
     folder_id = params[:folder_id]
     folder_name = params[:folder_name]
 
-    if current_user.update(
-      google_drive_folder_id: folder_id
-    )
+    if current_user.update(google_drive_folder_id: folder_id)
       render json: {
         status: 'success',
         message: 'Working folder has been set',
@@ -117,7 +95,12 @@ class FilesController < ApplicationController
     unless current_user.google_token.present?
       respond_to do |format|
         format.html { redirect_to auth_google_oauth2_path }
-        format.json { render json: { error: 'Google認証が必要です', redirect_to: auth_google_oauth2_path }, status: :unauthorized }
+        format.json { 
+          render json: { 
+            error: 'Google認証が必要です', 
+            redirect_to: auth_google_oauth2_path 
+          }, status: :unauthorized 
+        }
       end
     end
   end
