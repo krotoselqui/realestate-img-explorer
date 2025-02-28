@@ -1,35 +1,45 @@
 class FilesController < ApplicationController
   before_action :authenticate_user!
   before_action :check_google_auth
+
   def index
-    folder_path = params[:folder]
-    Rails.logger.info "Fetching files for path: #{folder_path}"
-    Rails.logger.info "Using token: #{current_user.google_token}"
+    Rails.logger.info "=== Starting files#index ==="
+    Rails.logger.info "User: #{current_user.email}"
+    Rails.logger.info "Access Token: #{current_user.google_token ? 'Present' : 'Missing'}"
+    
+    begin
+      folder_path = params[:folder]
+      Rails.logger.info "Requested folder path: #{folder_path || 'root'}"
 
-    files = google_drive_service.list_files(folder_path)
-    Rails.logger.info "Retrieved #{files.length} files"
+      files = google_drive_service.list_files(folder_path)
+      Rails.logger.info "Retrieved #{files&.length || 0} files from Google Drive"
 
-    # フォルダのみをフィルタリング
-    if params[:type] == 'folder'
-      files = files.select { |file| file.mime_type == 'application/vnd.google-apps.folder' }
-      Rails.logger.info "Filtered to #{files.length} folders"
-    end
+      # フォルダのみをフィルタリング
+      if params[:type] == 'folder'
+        files = files.select { |file| file.mime_type == 'application/vnd.google-apps.folder' }
+        Rails.logger.info "Filtered to #{files.length} folders"
+      end
 
-    render json: {
-      files: files.map { |file|
-        {
-          id: file.id,
-          name: file.name,
-          type: file.mime_type,
-          thumbnail_url: file.thumbnail_link,
-          view_url: file.web_view_link,
-          created_at: file.created_time,
-          updated_at: file.modified_time
+      render json: {
+        files: files.map { |file|
+          {
+            id: file.id,
+            name: file.name,
+            type: file.mime_type,
+            thumbnail_url: file.thumbnail_link,
+            view_url: file.web_view_link,
+            created_at: file.created_time,
+            updated_at: file.modified_time
+          }
         }
       }
-    }
-  rescue => e
-    render json: { error: e.message }, status: :internal_server_error
+    rescue => e
+      Rails.logger.error "Error in files#index: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      render json: { error: "フォルダの取得に失敗しました: #{e.message}" }, status: :internal_server_error
+    ensure
+      Rails.logger.info "=== Completed files#index ==="
+    end
   end
 
   def upload

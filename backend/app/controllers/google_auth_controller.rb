@@ -12,18 +12,35 @@ class GoogleAuthController < ApplicationController
 
   def callback
     client = google_oauth_client
+    Rails.logger.info "=== Processing Google OAuth Callback ==="
+    Rails.logger.info "Code received: #{params[:code].present?}"
+    Rails.logger.info "Scope received: #{params[:scope]}"
+
     client.code = params[:code]
     client.fetch_access_token!
+
+    Rails.logger.info "Access token fetched"
+    Rails.logger.info "Access token present: #{client.access_token.present?}"
+    Rails.logger.info "Refresh token present: #{client.refresh_token.present?}"
+    Rails.logger.info "Token expires in: #{client.expires_in} seconds"
 
     # アクセストークンをセッションに保存
     session[:google_access_token] = client.access_token
     session[:google_refresh_token] = client.refresh_token
 
     # ユーザー情報を更新
-    current_user.update(
+    update_result = current_user.update(
       google_token: client.access_token,
       google_refresh_token: client.refresh_token
     )
+
+    if update_result
+      Rails.logger.info "User tokens updated successfully"
+    else
+      Rails.logger.error "Failed to update user tokens: #{current_user.errors.full_messages.join(', ')}"
+    end
+
+    Rails.logger.info "=== Completed Google OAuth Callback ==="
 
     redirect_to dashboard_path, notice: 'Googleドライブとの連携が完了しました'
   rescue OAuth2::Error => e
