@@ -39,10 +39,10 @@
                     data: { confirm: 'Google連携を解除してもよろしいですか？\n選択したフォルダの設定も削除されます。' },
                     class: 'text-sm text-red-600 hover:text-red-800 underline' %>
               </div>
-              <div data-controller="folder-list">
+              <div data-controller="folder-list" id="folder-list-container">
                 <div data-folder-list-target="list" class="mt-5 bg-gray-50 rounded-md p-4 max-h-96 overflow-y-auto">
                   <!-- フォルダ一覧のローディング表示 -->
-                  <div class="animate-pulse">
+                  <div class="animate-pulse" data-folder-list-target="loading">
                     <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div class="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
                     <div class="h-4 bg-gray-200 rounded w-2/3"></div>

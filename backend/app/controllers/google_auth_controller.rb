@@ -70,8 +70,9 @@ class GoogleAuthController < ApplicationController
       authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
       token_credential_uri: 'https://oauth2.googleapis.com/token',
       scope: [
-        'https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/drive.metadata.readonly'
+        'https://www.googleapis.com/auth/drive',  # フルアクセス権限
+        'https://www.googleapis.com/auth/drive.metadata.readonly',  # メタデータ読み取り
+        'https://www.googleapis.com/auth/drive.readonly'  # 読み取り専用アクセス
       ],
       additional_parameters: {
         'access_type' => 'offline',

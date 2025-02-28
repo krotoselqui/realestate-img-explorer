@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   post 'upload', to: 'files#upload'
   post 'folders', to: 'files#create_folder'
   post 'set_working_folder', to: 'files#set_working_folder'
+  post 'create_root_folder', to: 'files#create_root_folder'
 
   # ルートページを認証状態に応じて振り分け
   root 'home#index'
