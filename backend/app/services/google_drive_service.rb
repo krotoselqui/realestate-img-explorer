@@ -1,20 +1,87 @@
 class GoogleDriveService
-  def initialize
-    @service = GoogleDriveConfig.drive_service
+  def initialize(access_token = nil)
+    @service = Google::Apis::DriveV3::DriveService.new
+    if access_token
+      @service.authorization = authorization_from_token(access_token)
+    end
   end
 
-  def list_files(folder_path)
-    folder_id = get_folder_id(folder_path)
-    return [] unless folder_id
-
-    query = "'#{folder_id}' in parents and trashed = false"
-    response = @service.list_files(
-      q: query,
-      fields: 'files(id, name, mimeType, thumbnailLink, webViewLink, createdTime, modifiedTime)',
-      order_by: 'name'
-    )
+  def list_files(folder_path = nil)
+    Rails.logger.info "Starting list_files with folder_path: #{folder_path}"
     
-    response.files || []
+    query = if folder_path.present?
+      folder_id = get_folder_id(folder_path)
+      Rails.logger.info "Resolved folder_id: #{folder_id}"
+      return [] unless folder_id
+      "'#{folder_id}' in parents"
+    else
+      Rails.logger.info "Listing root level folders"
+      "mimeType = 'application/vnd.google-apps.folder'"
+    end
+
+    query += " and trashed = false"
+    Rails.logger.info "Final query: #{query}"
+
+    begin
+      response = @service.list_files(
+        q: query,
+        fields: 'files(id, name, mimeType, thumbnailLink, webViewLink, createdTime, modifiedTime)',
+        order_by: 'name'
+      )
+      Rails.logger.info "API response received: #{response.files&.length} files found"
+      response.files || []
+    rescue => e
+      Rails.logger.error "Drive API error: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      []
+    end
+  end
+
+  private
+
+  def authorization_from_token(access_token)
+    auth = Signet::OAuth2::Client.new(
+      token_credential_uri: 'https://oauth2.googleapis.com/token',
+      client_id: ENV['GOOGLE_CLIENT_ID'],
+      client_secret: ENV['GOOGLE_CLIENT_SECRET'],
+      access_token: access_token,
+      scope: [
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/drive.metadata.readonly'
+      ]
+    )
+    auth
+  end
+
+  def list_files(folder_path = nil)
+    Rails.logger.info "Starting list_files with folder_path: #{folder_path}"
+    
+    query = if folder_path.present?
+      folder_id = get_folder_id(folder_path)
+      Rails.logger.info "Resolved folder_id: #{folder_id}"
+      return [] unless folder_id
+      "'#{folder_id}' in parents"
+    else
+      Rails.logger.info "Listing root level folders"
+      "mimeType = 'application/vnd.google-apps.folder'"
+    end
+
+    query += " and trashed = false"
+    Rails.logger.info "Final query: #{query}"
+
+    begin
+      response = @service.list_files(
+        q: query,
+        fields: 'files(id, name, mimeType, thumbnailLink, webViewLink, createdTime, modifiedTime)',
+        order_by: 'name'
+      )
+      Rails.logger.info "API response received: #{response.files&.length} files found"
+      response.files || []
+    rescue => e
+      Rails.logger.error "Drive API error: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      []
+    end
   end
 
   def upload_file(folder_path, file)

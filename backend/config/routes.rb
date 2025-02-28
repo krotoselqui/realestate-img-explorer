@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # Google OAuth認証関連のルーティング
   get 'auth/google_oauth2', to: 'google_auth#new'
   get 'auth/google_oauth2/callback', to: 'google_auth#callback'
+  delete 'auth/google_oauth2', to: 'google_auth#disconnect', as: :disconnect_google
 
   # ログイン・ユーザー登録関連のルーティング
   get 'login', to: 'sessions#new'
@@ -22,6 +23,7 @@ Rails.application.routes.draw do
   get 'files', to: 'files#index'
   post 'upload', to: 'files#upload'
   post 'folders', to: 'files#create_folder'
+  post 'set_working_folder', to: 'files#set_working_folder'
 
   # ルートページを認証状態に応じて振り分け
   root 'home#index'

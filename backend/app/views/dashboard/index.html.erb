@@ -22,7 +22,46 @@
       <div class="px-4 py-6 sm:px-0">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Welcome, <%= current_user.username %></h2>
 
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <% if current_user.google_token.present? %>
+          <!-- Googleドライブのフォルダ一覧 -->
+          <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-lg font-medium leading-6 text-gray-900">Googleドライブのフォルダ</h3>
+                  <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>作業フォルダを選択してください。</p>
+                  </div>
+                </div>
+                <%= button_to '連携を解除',
+                    disconnect_google_path,
+                    method: :delete,
+                    data: { confirm: 'Google連携を解除してもよろしいですか？\n選択したフォルダの設定も削除されます。' },
+                    class: 'text-sm text-red-600 hover:text-red-800 underline' %>
+              </div>
+              <div data-controller="folder-list">
+                <div data-folder-list-target="list" class="mt-5 bg-gray-50 rounded-md p-4 max-h-96 overflow-y-auto">
+                  <!-- フォルダ一覧のローディング表示 -->
+                  <div class="animate-pulse">
+                    <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </div>
+                <div class="mt-4 flex items-center justify-between">
+                  <p class="text-sm text-gray-500" data-folder-list-target="status">
+                    選択されたフォルダ: なし
+                  </p>
+                  <button type="button" id="select-folder" disabled
+                    data-action="folder-list#useFolderClick"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                    このフォルダを使用
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% else %>
           <!-- Google Drive連携カード -->
           <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-6">
@@ -46,7 +85,7 @@
               </div>
             </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
   </main>

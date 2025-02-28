@@ -30,6 +30,15 @@ class GoogleAuthController < ApplicationController
     redirect_to dashboard_path, alert: 'Googleドライブとの連携に失敗しました'
   end
 
+  def disconnect
+    current_user.update(
+      google_token: nil,
+      google_refresh_token: nil,
+      google_drive_folder_id: nil
+    )
+    redirect_to dashboard_path, notice: 'Googleドライブとの連携を解除しました'
+  end
+
   private
 
   def google_oauth_client
